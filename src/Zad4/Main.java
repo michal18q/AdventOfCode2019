@@ -44,8 +44,8 @@ public class Main {
                 numberOfAppearances++;
             }
         }
-        numberOfRepetitions.put(previousDigit, numberOfAppearances);
 
+        numberOfRepetitions.put(previousDigit, numberOfAppearances);
 
         return numberOfRepetitions.containsValue(2);
     }
@@ -75,5 +75,4 @@ public class Main {
         }
         return false;
     }
-
 }

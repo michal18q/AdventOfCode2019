@@ -8,10 +8,10 @@ import static java.lang.Integer.parseInt;
 
 public class Main {
 
-    private static String fileName = "src/Zad5/input.txt";
+    private static final String fileName = "src/Zad5/input.txt";
+    private static final int input = 5;
     private static int[] memory;
     private static int currentAddress;
-    private static int input;
 
     public static void main(String[] args) {
         initializeProgramData();
@@ -61,8 +61,6 @@ public class Main {
                 default:
                     throw new IllegalArgumentException("Bledne dane.");
             }
-
-            System.out.println("wykonano instrukcje: " + instruction);
         }
 
     }
@@ -70,14 +68,12 @@ public class Main {
     private static void initializeProgramData() {
         memory = prepareData();
         currentAddress = 0;
-        input = 5;
     }
 
     private static int[] getModes(int modesInt) {
         int[] modes = new int[3];
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < 3; i++)
             modes[i] = Math.floorDiv(modesInt, (int) Math.pow(10, i)) % 10;
-        }
         return modes;
     }
 

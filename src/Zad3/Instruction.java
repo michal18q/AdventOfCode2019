@@ -14,16 +14,8 @@ public class Instruction {
         return direction;
     }
 
-    public void setDirection(char direction) {
-        this.direction = direction;
-    }
-
     public int getNumberOfSteps() {
         return numberOfSteps;
-    }
-
-    public void setNumberOfSteps(int numberOfSteps) {
-        this.numberOfSteps = numberOfSteps;
     }
 
     @Override

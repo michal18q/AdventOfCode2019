@@ -11,7 +11,7 @@ import static java.lang.Integer.parseInt;
 
 public class Main {
 
-    private static String inputFile = "src/Zad3/input.txt";
+    private static final String inputFile = "src/Zad3/input.txt";
 
     private static List<Instruction> instructionsForWireA = new ArrayList<>();
     private static List<Instruction> instructionsForWireB = new ArrayList<>();
@@ -29,11 +29,11 @@ public class Main {
 
         setPointersToStatingPosition();
         createWirePath(instructionsForWireA, pathOfWireA);
-        System.out.println("Koniec wyznaczania trasy rekrutacja.A.");
+        System.out.println("Koniec wyznaczania trasy A.");
 
         setPointersToStatingPosition();
         createWirePath(instructionsForWireB, pathOfWireB);
-        System.out.println("Koniec wyznaczania trasy rekrutacja.B.");
+        System.out.println("Koniec wyznaczania trasy B.");
 
 //        Part I
 //        Intersection closestIntersection = getIntersectionClosestToStartingPosition();
@@ -51,7 +51,6 @@ public class Main {
             for (Position positionB : pathOfWireB) {
                 if (positionA.equals(positionB)) {
                     Intersection intersection = new Intersection(positionA.getPositionX(), positionA.getPositionY(), startingPositionX, startingPositionY);
-                    System.out.println(intersection);
                     if (closestIntersection == null || intersection.getDistanceFromCenter() < closestIntersection.getDistanceFromCenter()){
                         closestIntersection = intersection;
                     }
@@ -106,30 +105,23 @@ public class Main {
     }
 
     private static void moveToTheRight(int numberOfSteps, List<Position> pathOfWire) {
-        for (int i = 1; i <= numberOfSteps; i++) {
+        for (int i = 1; i <= numberOfSteps; i++)
             pathOfWire.add(new Position(++currentPointerX, currentPointerY));
-//            map[++currentPositionX][currentPositionY] = 1;
-        }
     }
 
     private static void moveToTheLeft(int numberOfSteps, List<Position> pathOfWire) {
-        for (int i = 1; i <= numberOfSteps; i++) {
+        for (int i = 1; i <= numberOfSteps; i++)
             pathOfWire.add(new Position(--currentPointerX, currentPointerY));
-        }
     }
 
     private static void moveUp(int numberOfSteps, List<Position> pathOfWire) {
-        for (int i = 1; i <= numberOfSteps; i++) {
+        for (int i = 1; i <= numberOfSteps; i++)
             pathOfWire.add(new Position(currentPointerX,++currentPointerY));
-//            map[currentPositionX][++currentPositionY] = 1;
-        }
     }
 
     private static void moveDown(int numberOfSteps, List<Position> pathOfWire) {
-        for (int i = 1; i <= numberOfSteps; i++) {
+        for (int i = 1; i <= numberOfSteps; i++)
             pathOfWire.add(new Position(currentPointerX,--currentPointerY));
-//            map[currentPositionX][--currentPositionY] = 1;
-        }
     }
 
     private static void loadData() {
@@ -143,13 +135,11 @@ public class Main {
             for (String wire : wireA) {
                 Instruction instruction = new Instruction(wire.charAt(0),parseInt(wire.substring(1)));
                 instructionsForWireA.add(instruction);
-//                System.out.println(instruction);
             }
 
             for (String wire : wireB) {
                 Instruction instruction = new Instruction(wire.charAt(0),parseInt(wire.substring(1)));
                 instructionsForWireB.add(instruction);
-//                System.out.println(instruction);
             }
 
         } catch (IOException e) {

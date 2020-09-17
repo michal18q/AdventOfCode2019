@@ -8,21 +8,16 @@ import static java.lang.Integer.parseInt;
 
 public class Main {
 
-    private static String fileName = "src/Zad2/input.txt";
+    private static final String fileName = "src/Zad2/input.txt";
     private static int[] memory;
     private static int currentAddress;
-    private static int desiredValue = 19690720;
+    private static final int desiredValue = 19690720;
 
     public static void main(String[] args) {
 
         findNounAndVerb();
         System.out.println("Szukana para to: " + memory[1] + " i " + memory[2]);
         System.out.println("Wynik ostateczny: " + (100 * memory[1] + memory[2]));
-
-//        System.out.println("Koncowe wartosci:");
-//        for (int i : memory) {
-//            System.out.print(i +", ");
-//        }
 
     }
 
@@ -45,8 +40,6 @@ public class Main {
                     }
                     currentAddress += 4;
                 }
-
-//                System.out.println("Obrot: " + noun + " i " + verb);
 
                 if (memory[0] == desiredValue) {
                     return;
