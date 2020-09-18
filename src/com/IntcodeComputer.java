@@ -3,21 +3,37 @@ package com;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
 public class IntcodeComputer {
 
-    private final String dataFileName;
+    private String dataFileName;
     private int currentAddress;
     private int[] memory;
-    private int input;
+    private List<Integer> inputs;
+    private int currentInput;
+    private List<Integer> outputs;
 
     public IntcodeComputer(String dataFileName, int input) {
+        initialize(dataFileName);
+        inputs = new ArrayList<>();
+        inputs.add(input);
+    }
+
+    public IntcodeComputer(String dataFileName, List<Integer> inputs) {
+        initialize(dataFileName);
+        this.inputs = inputs;
+    }
+
+    private void initialize(String dataFileName) {
         this.dataFileName = dataFileName;
-        this.input = input;
-        currentAddress = 0;
         loadDataFromFile(dataFileName);
+        currentInput = 0;
+        outputs = new ArrayList<>();
+        currentAddress = 0;
     }
 
     public void reset() {
@@ -132,10 +148,13 @@ public class IntcodeComputer {
 
     private void outputValue() {
         System.out.println("Output: " + memory[memory[currentAddress+1]]);
+        outputs.add(memory[memory[currentAddress+1]]);
     }
 
     private void inputValue() {
+        int input = inputs.get(currentInput++);
         memory[memory[currentAddress+1]] = input;
+        System.out.println("Nastąpil input " + input);
     }
 
     private void multiplyValuesAndSave(int[] modes) {
@@ -148,5 +167,9 @@ public class IntcodeComputer {
         int value1 = getValue(modes[0], 1);
         int value2 = getValue(modes[1], 2);
         memory[memory[currentAddress +3]] = value1 + value2;
+    }
+
+    public List<Integer> getOutputs() {
+        return outputs;
     }
 }
