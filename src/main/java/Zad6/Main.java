@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Main {
 
-    private static final String inputFileName = "src/Zad6/input.txt";
+    private static final String inputFileName = "src/main/resources/Zad6/input.txt";
     private static ArrayList<String[]> spaceObjectsWithOrbits;
     private static HashMap<String, SpaceObject> mappedSpaceObjects;
 
@@ -61,7 +61,7 @@ public class Main {
             mappedSpaceObjects.put(centerObjectName, centerObject);
             mappedSpaceObjects.put(orbitingObjectName, orbitingObject);
         }
-        System.out.println("Mapa elegancko tego");
+        System.out.println("Map generated.");
     }
 
     private static void initializeData() {

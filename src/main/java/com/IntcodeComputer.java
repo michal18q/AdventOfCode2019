@@ -106,7 +106,7 @@ public class IntcodeComputer {
                     finish = true;
                     break;
                 default:
-                    throw new IllegalArgumentException("Bledne dane.");
+                    throw new IllegalArgumentException("Faulty data.");
             }
         }
     }
@@ -152,9 +152,7 @@ public class IntcodeComputer {
     }
 
     private void inputValue() {
-        int input = inputs.get(currentInput++);
-        memory[memory[currentAddress+1]] = input;
-        System.out.println("Nastąpil input " + input);
+        memory[memory[currentAddress+1]] = inputs.get(currentInput++);
     }
 
     private void multiplyValuesAndSave(int[] modes) {

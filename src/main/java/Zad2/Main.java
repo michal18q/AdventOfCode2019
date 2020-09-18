@@ -1,10 +1,11 @@
 package Zad2;
 
+
 import com.IntcodeComputer;
 
 public class Main {
 
-    private static final String fileName = "src/Zad2/input.txt";
+    private static final String fileName = "src/main/resources/Zad2/input.txt";
     private static final int desiredValue = 19690720;
 
     public static void main(String[] args) {
@@ -12,7 +13,7 @@ public class Main {
         IntcodeComputer computer = new IntcodeComputer(fileName, 0);
         findNounAndVerb(computer);
 
-        System.out.println("Wynik ostateczny: " + (100 * computer.getValueFromMemory(1) + computer.getValueFromMemory(2)));
+        System.out.println("Final result: " + (100 * computer.getValueFromMemory(1) + computer.getValueFromMemory(2)));
 
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Main {
 
-    private static String inputFileName = "src/Zad7/input.txt";
+    private static String inputFileName = "src/main/resources/Zad7/input.txt";
     private static int firstInputSignal = 0;
     private static final int minPhaseSettingValue = 0;
     private static final int maxPhaseSettingValue = 4;

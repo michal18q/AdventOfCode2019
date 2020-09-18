@@ -11,7 +11,7 @@ import static java.lang.Integer.parseInt;
 
 public class Main {
 
-    private static final String inputFile = "src/Zad3/input.txt";
+    private static final String inputFile = "src/main/resources/Zad3/input.txt";
 
     private static List<Instruction> instructionsForWireA = new ArrayList<>();
     private static List<Instruction> instructionsForWireB = new ArrayList<>();

@@ -4,7 +4,7 @@ import com.IntcodeComputer;
 
 public class Main {
 
-    public static final String inputFileName = "src/Zad5/input.txt";
+    public static final String inputFileName = "src/main/resources/Zad5/input.txt";
     public static final int inputValue = 5;
 
     public static void main(String[] args) {

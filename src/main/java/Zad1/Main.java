@@ -4,7 +4,7 @@ import java.io.*;
 
 public class Main {
 
-    private static final String fileName = "src/Zad1/input.txt";
+    private static final String fileName = "src/main/resources/Zad1/input.txt";
 
     public static void main(String[] args) {
 
