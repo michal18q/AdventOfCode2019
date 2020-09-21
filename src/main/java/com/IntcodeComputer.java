@@ -164,7 +164,6 @@ public class IntcodeComputer {
         System.out.println("Pobrano input o indeksie:" + currentInput);
         if(inputs.size() - 1 > currentInput)
             currentInput++;
-
     }
 
     private void multiplyValuesAndSave(int[] modes) {
