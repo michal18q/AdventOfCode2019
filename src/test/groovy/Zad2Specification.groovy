@@ -1,6 +1,4 @@
-import Zad2.Main
 import Zad2.NounAndVerbFinder
-import com.IntcodeComputer
 import spock.lang.Specification
 
 class Zad2Specification extends Specification {

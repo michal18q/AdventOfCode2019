@@ -1,5 +1,4 @@
-package Zad1
-
+import Zad1.FuelCalculator
 import spock.lang.Specification
 
 class Zad1Specification extends Specification {
@@ -127,5 +126,4 @@ class Zad1Specification extends Specification {
         then:
         totalFuel == 4843929
     }
-
 }

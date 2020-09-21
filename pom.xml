@@ -44,6 +44,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <testFailureIgnore>true</testFailureIgnore>
+<!--                    <includes>-->
+<!--                        <include>**/Zad2/*</include>-->
+<!--                        <include>**/Zad5/*</include>-->
+<!--                        <include>**/Zad7/*</include>-->
+<!--                    </includes>-->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
