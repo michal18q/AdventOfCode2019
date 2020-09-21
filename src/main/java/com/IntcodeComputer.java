@@ -16,6 +16,7 @@ public class IntcodeComputer {
     private List<Integer> inputs;
     private int currentInput;
     private List<Integer> outputs;
+    private boolean running;
 
     public IntcodeComputer(String dataFileName, int input) {
         initialize(dataFileName);
@@ -28,12 +29,19 @@ public class IntcodeComputer {
         this.inputs = inputs;
     }
 
+    public IntcodeComputer(String fileName) {
+        initialize(fileName);
+        inputs = new ArrayList<>();
+        outputs = new ArrayList<>();
+    }
+
     private void initialize(String dataFileName) {
         this.dataFileName = dataFileName;
         loadDataFromFile(dataFileName);
         currentInput = 0;
         outputs = new ArrayList<>();
         currentAddress = 0;
+        running = false;
     }
 
     public void reset() {
@@ -64,8 +72,8 @@ public class IntcodeComputer {
     }
 
     public void run() {
-        boolean finish = false;
-        while (!finish) {
+        running = true;
+        while (running) {
             int instructionAndModes = memory[currentAddress];
 
             int instruction = instructionAndModes % 100;
@@ -103,7 +111,7 @@ public class IntcodeComputer {
                     currentAddress += 4;
                     break;
                 case 99:
-                    finish = true;
+                    running = false;
                     break;
                 default:
                     throw new IllegalArgumentException("Faulty data.");
@@ -152,7 +160,11 @@ public class IntcodeComputer {
     }
 
     private void inputValue() {
-        memory[memory[currentAddress+1]] = inputs.get(currentInput++);
+        memory[memory[currentAddress+1]] = inputs.get(currentInput);
+        System.out.println("Pobrano input o indeksie:" + currentInput);
+        if(inputs.size() - 1 > currentInput)
+            currentInput++;
+
     }
 
     private void multiplyValuesAndSave(int[] modes) {
@@ -169,5 +181,17 @@ public class IntcodeComputer {
 
     public List<Integer> getOutputs() {
         return outputs;
+    }
+
+    public void addInputValue(int currentInput) {
+        inputs.add(currentInput);
+    }
+
+    public int getLastOutput() {
+        return outputs.get(outputs.size()-1);
+    }
+
+    public boolean isRunning(){
+        return running;
     }
 }
