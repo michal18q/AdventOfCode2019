@@ -16,7 +16,7 @@ public class IntcodeComputer {
     private List<Integer> inputs;
     private int currentInput;
     private List<Integer> outputs;
-    private boolean running;
+    private String status;
 
     public IntcodeComputer(String dataFileName, int input) {
         initialize(dataFileName);
@@ -41,7 +41,7 @@ public class IntcodeComputer {
         currentInput = 0;
         outputs = new ArrayList<>();
         currentAddress = 0;
-        running = false;
+        status = "paused";
     }
 
     public void reset() {
@@ -72,8 +72,8 @@ public class IntcodeComputer {
     }
 
     public void run() {
-        running = true;
-        while (running) {
+        status = "running";
+        while (status == "running") {
             int instructionAndModes = memory[currentAddress];
 
             int instruction = instructionAndModes % 100;
@@ -95,6 +95,7 @@ public class IntcodeComputer {
                 case 4:
                     outputValue();
                     currentAddress += 2;
+                    status = "paused";
                     break;
                 case 5:
                     currentAddress = jumpIfTrue(modes);
@@ -111,7 +112,7 @@ public class IntcodeComputer {
                     currentAddress += 4;
                     break;
                 case 99:
-                    running = false;
+                    status = "finished";
                     break;
                 default:
                     throw new IllegalArgumentException("Faulty data.");
@@ -155,15 +156,13 @@ public class IntcodeComputer {
     }
 
     private void outputValue() {
-        System.out.println("Output: " + memory[memory[currentAddress+1]]);
+//        System.out.println("Output: " + memory[memory[currentAddress+1]]);
         outputs.add(memory[memory[currentAddress+1]]);
     }
 
     private void inputValue() {
-        memory[memory[currentAddress+1]] = inputs.get(currentInput);
-        System.out.println("Pobrano input o indeksie:" + currentInput);
-        if(inputs.size() - 1 > currentInput)
-            currentInput++;
+        memory[memory[currentAddress+1]] = inputs.get(currentInput++);
+//        System.out.println("Pobrano input o indeksie:" + currentInput + " i wartości: " + inputs.get(currentInput));
     }
 
     private void multiplyValuesAndSave(int[] modes) {
@@ -190,7 +189,7 @@ public class IntcodeComputer {
         return outputs.get(outputs.size()-1);
     }
 
-    public boolean isRunning(){
-        return running;
+    public boolean hasFinished(){
+        return status.equals("finished");
     }
 }
