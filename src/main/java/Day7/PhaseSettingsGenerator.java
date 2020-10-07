@@ -1,4 +1,4 @@
-package Zad7;
+package Day7;
 
 import java.util.ArrayList;
 import java.util.List;

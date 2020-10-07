@@ -50,9 +50,9 @@
                 <configuration>
                     <testFailureIgnore>true</testFailureIgnore>
 <!--                    <includes>-->
-<!--                        <include>**/Zad2/*</include>-->
-<!--                        <include>**/Zad5/*</include>-->
-<!--                        <include>**/Zad7/*</include>-->
+<!--                        <include>**/Day2/*</include>-->
+<!--                        <include>**/Day5/*</include>-->
+<!--                        <include>**/Day7/*</include>-->
 <!--                    </includes>-->
                 </configuration>
             </plugin>

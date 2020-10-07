@@ -1,4 +1,4 @@
-package Zad3;
+package Day3;
 
 public class Instruction {
 

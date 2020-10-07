@@ -1,4 +1,4 @@
-package Zad5;
+package Day5;
 
 import com.IntcodeComputer;
 

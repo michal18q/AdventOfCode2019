@@ -1,12 +1,12 @@
-import Zad2.NounAndVerbFinder
+import Day2.NounAndVerbFinder
 import spock.lang.Specification
 
-class Zad2Specification extends Specification {
+class Day2Specification extends Specification {
 
     def 'should calculate proper final value'() {
 
         given:
-        def fileName = "src/main/resources/Zad2/input.txt"
+        def fileName = "src/main/resources/Day2/input.txt"
         def desiredValue = 19690720
 
         when:

@@ -1,7 +1,7 @@
-import Zad1.FuelCalculator
+import Day1.FuelCalculator
 import spock.lang.Specification
 
-class Zad1Specification extends Specification {
+class Day1Specification extends Specification {
 
     def "should calculate proper fuel amount for 1 item"() {
 

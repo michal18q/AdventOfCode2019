@@ -1,13 +1,13 @@
-import Zad7.AmplifierSystem
+import Day7.AmplifierSystem
 import spock.lang.Specification
 
-class Zad7Specification extends Specification {
+class Day7Specification extends Specification {
 
     def 'should return proper single signal value' () {
 
         given:
         def numberOfAmplifiers = 5
-        def programDataFile = "src/test/resources/Zad7/part1TestInput.txt"
+        def programDataFile = "src/test/resources/Day7/part1TestInput.txt"
         def phaseSettings = [4,3,2,1,0]
         def firstInputSignal = 0
 
@@ -23,7 +23,7 @@ class Zad7Specification extends Specification {
 
         given:
         def numberOfAmplifiers = 5
-        def programDataFile = "src/test/resources/Zad7/part2TestInput.txt"
+        def programDataFile = "src/test/resources/Day7/part2TestInput.txt"
         def phaseSettings = [9,8,7,6,5]
         def firstInputSignal = 0
 
