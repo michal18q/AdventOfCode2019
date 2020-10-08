@@ -20,7 +20,7 @@ public class Main {
         System.out.println("Control number: " + controlNumber);
 
         System.out.println("\nPassword:");
-        imageDecoder.printMessage();
+        imageDecoder.printImage();
     }
 
 

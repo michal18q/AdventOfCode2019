@@ -5,31 +5,31 @@ import java.util.stream.Collectors;
 
 public class ImageDecoder {
 
-    private List<List<Integer>> pictureLayers;
+    private List<List<Integer>> imageLayers;
     private int imageHeight;
     private int imageWidth;
 
     public ImageDecoder(String inputData, int imageHeight, int imageWidth) {
         this.imageHeight = imageHeight;
         this.imageWidth = imageWidth;
-        this.pictureLayers = generatePictureLayers(inputData);
+        this.imageLayers = generateImageLayers(inputData);
     }
 
-    private List<List<Integer>> generatePictureLayers(String inputData) {
-        List<List<Integer>> pictureLayers = new ArrayList<>();
+    private List<List<Integer>> generateImageLayers(String inputData) {
+        List<List<Integer>> imageLayers = new ArrayList<>();
 
         while(inputData.length() > 0) {
             List<Integer> layer = Arrays.stream(inputData.substring(0, (imageHeight * imageWidth)).split("")).map(Integer::parseInt).collect(Collectors.toList());
-            pictureLayers.add(layer);
+            imageLayers.add(layer);
             inputData = inputData.substring((imageHeight * imageWidth));
         }
 
-        return pictureLayers;
+        return imageLayers;
     }
 
     public int calculateControlNumber() {
 
-        List<Integer> layerWithFewestZeros = getLayerWithLeastZeros();
+        List<Integer> layerWithFewestZeros = getLayerWithFewestZeros();
 
         int numberOfOnes = countCharactersOfValue(layerWithFewestZeros, 1);
         int numberOfTwos = countCharactersOfValue(layerWithFewestZeros, 2);
@@ -37,24 +37,12 @@ public class ImageDecoder {
         return numberOfOnes * numberOfTwos;
     }
 
-    public void printMessage() {
+    public void printImage() {
 
-        List<Integer> picture = new ArrayList<>();
-
-        for(int currentPosition = 0; currentPosition < imageHeight * imageWidth; currentPosition++)
-        {
-            int currentLayer=0;
-            int displayedValue;
-
-            do {
-                displayedValue = pictureLayers.get(currentLayer++).get(currentPosition);
-            } while(displayedValue == 2);
-
-            picture.add(displayedValue);
-        }
+        List<Integer> image = composeImageFromLayers();
 
         int currentPosition = 0;
-        for(Integer pixel : picture) {
+        for(Integer pixel : image) {
             System.out.print(pixel == 0 ? " " : "*");
             if(++currentPosition % imageWidth == 0) {
                 System.out.println();
@@ -62,8 +50,25 @@ public class ImageDecoder {
         }
     }
 
-    private List<Integer> getLayerWithLeastZeros() {
-        return pictureLayers.stream().min(Comparator.comparing(list -> countCharactersOfValue(list, 0))).get();
+    public List<Integer> composeImageFromLayers() {
+        List<Integer> image = new ArrayList<>();
+
+        for(int currentPosition = 0; currentPosition < imageHeight * imageWidth; currentPosition++)
+        {
+            int currentLayer=0;
+            int displayedValue;
+
+            do {
+                displayedValue = imageLayers.get(currentLayer++).get(currentPosition);
+            } while(displayedValue == 2);
+
+            image.add(displayedValue);
+        }
+        return image;
+    }
+
+    private List<Integer> getLayerWithFewestZeros() {
+        return imageLayers.stream().min(Comparator.comparing(list -> countCharactersOfValue(list, 0))).get();
     }
 
     private int countCharactersOfValue(List<Integer> layer, int number) {
