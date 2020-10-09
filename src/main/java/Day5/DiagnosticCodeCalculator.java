@@ -5,7 +5,8 @@ import com.IntcodeComputer;
 public class DiagnosticCodeCalculator {
 
     public static int calculateDiagnosticCode(String inputFileName, int systemID) {
-        IntcodeComputer intcodeComputer = new IntcodeComputer(inputFileName, systemID);
+        IntcodeComputer intcodeComputer = new IntcodeComputer(inputFileName);
+        intcodeComputer.addInputValue(systemID);
         intcodeComputer.run();
         return intcodeComputer.getLastOutput();
     }

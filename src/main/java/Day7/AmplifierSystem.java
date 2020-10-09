@@ -12,7 +12,9 @@ public class AmplifierSystem {
     public AmplifierSystem(int numberOfAmplifiers, String inputFileName, List<Integer> phaseSettings) {
         amplifiers = new ArrayList<>();
         for (int i = 0; i < numberOfAmplifiers; i++) {
-            amplifiers.add(new IntcodeComputer(inputFileName, phaseSettings.get(i)));
+            IntcodeComputer amplifier = new IntcodeComputer(inputFileName);
+            amplifier.addInputValue(phaseSettings.get(i));
+            amplifiers.add(amplifier);
         }
     }
 

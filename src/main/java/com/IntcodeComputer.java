@@ -1,12 +1,9 @@
 package com;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Integer.parseInt;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class IntcodeComputer {
 
@@ -18,61 +15,26 @@ public class IntcodeComputer {
     private List<Integer> outputs;
     private String status;
 
-    public IntcodeComputer(String dataFileName, int input) {
-        initialize(dataFileName);
-        inputs = new ArrayList<>();
-        inputs.add(input);
-    }
-
-    public IntcodeComputer(String dataFileName, List<Integer> inputs) {
-        initialize(dataFileName);
-        this.inputs = inputs;
-    }
 
     public IntcodeComputer(String fileName) {
-        initialize(fileName);
-        inputs = new ArrayList<>();
-        outputs = new ArrayList<>();
-    }
-
-    private void initialize(String dataFileName) {
-        this.dataFileName = dataFileName;
-        loadDataFromFile(dataFileName);
+        this.dataFileName = fileName;
+        memory = DataLoader.loadDataFromFile(dataFileName);
         currentInput = 0;
+        inputs = new ArrayList<>();
         outputs = new ArrayList<>();
         currentAddress = 0;
         status = "paused";
     }
 
     public void reset() {
-        loadDataFromFile(dataFileName);
+        memory = DataLoader.loadDataFromFile(dataFileName);
         currentAddress = 0;
     }
 
-    public int getValueFromMemory(int index) {
-        return memory[index];
-    }
-
-    public void loadDataFromFile(String fileName) {
-        memory = new int[0];
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            String[] program = reader.readLine().split(",");
-            memory = new int[program.length];
-            for (int i =0; i< program.length; i++) {
-                memory[i] = parseInt(program[i]);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setMemoryValue(int index, int value) {
-        memory[index] = value;
-    }
-
     public void run() {
+
         status = "running";
+
         while (status == "running") {
             int instructionAndModes = memory[currentAddress];
 
@@ -81,15 +43,15 @@ public class IntcodeComputer {
 
             switch (instruction) {
                 case 1:
-                    addValuesAndSave(modes);
+                    setMemoryValue(memory[currentAddress +3], addValues(modes));
                     currentAddress += 4;
                     break;
                 case 2:
-                    multiplyValuesAndSave(modes);
+                    setMemoryValue(memory[currentAddress +3], multiplyValues(modes));
                     currentAddress += 4;
                     break;
                 case 3:
-                    inputValue();
+                    setMemoryValue(memory[currentAddress+1], readSystemInput());
                     currentAddress += 2;
                     break;
                 case 4:
@@ -98,17 +60,17 @@ public class IntcodeComputer {
                     status = "paused";
                     break;
                 case 5:
-                    currentAddress = jumpIfTrue(modes);
+                    currentAddress = calculateNextAddressIfTrue(modes);
                     break;
                 case 6:
-                    currentAddress = jumpIfFalse(modes);
+                    currentAddress = calculateNextAddressIfFalse(modes);
                     break;
                 case 7:
-                    lessThan(modes);
+                    setMemoryValue(memory[currentAddress + 3],lessThan(modes));
                     currentAddress += 4;
                     break;
                 case 8:
-                    equalsTo(modes);
+                    setMemoryValue(memory[currentAddress + 3],equalsTo(modes));
                     currentAddress += 4;
                     break;
                 case 99:
@@ -120,6 +82,10 @@ public class IntcodeComputer {
         }
     }
 
+    private Integer readSystemInput() {
+        return inputs.get(currentInput++);
+    }
+
     private int[] getModes(int modesInt) {
         int[] modes = new int[3];
         for(int i = 0; i < 3; i++)
@@ -127,62 +93,59 @@ public class IntcodeComputer {
         return modes;
     }
 
-    private void equalsTo(int[] modes) {
+    private int equalsTo(int[] modes) {
+        return performOperation(modes, (v1, v2) -> v1.equals(v2) ? 1 : 0);
+    }
+
+    private int lessThan(int[] modes) {
+        return performOperation(modes, (v1, v2) -> v1 < v2 ? 1 : 0);
+    }
+
+    private void outputValue() {
+        outputs.add(memory[memory[currentAddress+1]]);
+    }
+
+    private int multiplyValues(int[] modes) {
+        return performOperation(modes, (v1, v2) -> v1 * v2);
+    }
+
+    private int addValues(int[] modes) {
+        return performOperation(modes, (v1, v2) -> v1 + v2);
+    }
+
+    private int performOperation(int[] modes, BiFunction<Integer, Integer, Integer> callback) {
         int value1 = getValue(modes[0], 1);
         int value2 = getValue(modes[1], 2);
-        memory[memory[currentAddress +3]] = value1 == value2 ? 1 : 0;
+        return callback.apply(value1, value2);
+    }
+
+    private int calculateNextAddressIfFalse(int[] modes) {
+        return getCurrentAddressBasedOnCondition(modes, value -> value == 0);
+    }
+
+    private int calculateNextAddressIfTrue(int[] modes) {
+        return getCurrentAddressBasedOnCondition(modes, value -> value != 0);
+    }
+
+    private int getCurrentAddressBasedOnCondition(int[] modes, Function<Integer, Boolean> condition) {
+        int valueToBeChecked = getValue(modes[0], 1);
+        return condition.apply(valueToBeChecked) ? getValue(modes[1], 2) : currentAddress + 3;
     }
 
     private int getValue(int mode, int parameterPosition) {
         return mode == 0 ? memory[memory[currentAddress + parameterPosition]] : memory[currentAddress +parameterPosition];
     }
 
-    private void lessThan(int[] modes) {
-        int value1 = getValue(modes[0], 1);
-        int value2 = getValue(modes[1], 2);
-        memory[memory[currentAddress +3]] = value1 < value2 ? 1 : 0;
+    public void setMemoryValue(int index, int value) {
+        memory[index] = value;
     }
 
-    private int jumpIfFalse(int[] modes) {
-        int value1 = getValue(modes[0], 1);
-        int value2 = getValue(modes[1], 2);
-        return value1 == 0 ?  value2 : currentAddress + 3;
+    public int getValueFromMemory(int index) {
+        return memory[index];
     }
 
-    private int jumpIfTrue(int[] modes) {
-        int value1 = getValue(modes[0], 1);
-        int value2 = getValue(modes[1], 2);
-        return value1 != 0 ?  value2 : currentAddress + 3;
-    }
-
-    private void outputValue() {
-//        System.out.println("Output: " + memory[memory[currentAddress+1]]);
-        outputs.add(memory[memory[currentAddress+1]]);
-    }
-
-    private void inputValue() {
-        memory[memory[currentAddress+1]] = inputs.get(currentInput++);
-//        System.out.println("Pobrano input o indeksie:" + currentInput + " i wartości: " + inputs.get(currentInput));
-    }
-
-    private void multiplyValuesAndSave(int[] modes) {
-        int value1 = getValue(modes[0], 1);
-        int value2 = getValue(modes[1], 2);
-        memory[memory[currentAddress +3]] = value1 * value2;
-    }
-
-    private void addValuesAndSave(int[] modes) {
-        int value1 = getValue(modes[0], 1);
-        int value2 = getValue(modes[1], 2);
-        memory[memory[currentAddress +3]] = value1 + value2;
-    }
-
-    public List<Integer> getOutputs() {
-        return outputs;
-    }
-
-    public void addInputValue(int currentInput) {
-        inputs.add(currentInput);
+    public void addInputValue(int inputValue) {
+        inputs.add(inputValue);
     }
 
     public int getLastOutput() {
