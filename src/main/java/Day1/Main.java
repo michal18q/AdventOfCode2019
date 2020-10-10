@@ -23,7 +23,6 @@ public class Main {
             String line;
             while((line = reader.readLine()) != null) {
                 data.add(Integer.parseInt(line));
-
             }
         } catch (IOException e) {
             e.printStackTrace();

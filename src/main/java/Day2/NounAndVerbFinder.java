@@ -7,6 +7,7 @@ public class NounAndVerbFinder {
     public static Integer findNounAndVerb(String fileName, int desiredValue) {
 
         IntcodeComputer computer = new IntcodeComputer(fileName);
+
         for(int noun = 0; noun <= 99; noun++) {
             for (int verb = 0; verb <= 99; verb++) {
                 resetComputer(computer, noun, verb);

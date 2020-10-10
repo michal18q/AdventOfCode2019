@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static com.IntcodeComputer.Status.*;
+
 public class IntcodeComputer {
 
     private String dataFileName;
@@ -13,7 +15,7 @@ public class IntcodeComputer {
     private List<Integer> inputs;
     private int currentInput;
     private List<Integer> outputs;
-    private String status;
+    private Status status;
 
 
     public IntcodeComputer(String fileName) {
@@ -23,7 +25,7 @@ public class IntcodeComputer {
         inputs = new ArrayList<>();
         outputs = new ArrayList<>();
         currentAddress = 0;
-        status = "paused";
+        status = PAUSED;
     }
 
     public void reset() {
@@ -33,48 +35,48 @@ public class IntcodeComputer {
 
     public void run() {
 
-        status = "running";
+        status = RUNNING;
 
-        while (status == "running") {
+        while (status == RUNNING) {
+            
             int instructionAndModes = memory[currentAddress];
-
-            int instruction = instructionAndModes % 100;
-            int[] modes = getModes(Math.floorDiv(instructionAndModes, 100));
+            int instruction = getInstruction(instructionAndModes);
+            int[] modes = getModes(instructionAndModes);
 
             switch (instruction) {
                 case 1:
-                    setMemoryValue(memory[currentAddress +3], addValues(modes));
-                    currentAddress += 4;
+                    setMemoryValue(getNewValueDestinationAddress(3), addValues(modes));
+                    moveCurrentAddressBy(4);
                     break;
                 case 2:
-                    setMemoryValue(memory[currentAddress +3], multiplyValues(modes));
-                    currentAddress += 4;
+                    setMemoryValue(getNewValueDestinationAddress(3), multiplyValues(modes));
+                    moveCurrentAddressBy(4);
                     break;
                 case 3:
-                    setMemoryValue(memory[currentAddress+1], readSystemInput());
-                    currentAddress += 2;
+                    setMemoryValue(getNewValueDestinationAddress(1), readSystemInput());
+                    moveCurrentAddressBy(2);
                     break;
                 case 4:
                     outputValue();
-                    currentAddress += 2;
-                    status = "paused";
+                    moveCurrentAddressBy(2);
+                    status = PAUSED;
                     break;
                 case 5:
-                    currentAddress = calculateNextAddressIfTrue(modes);
+                    setCurrentAddress(calculateNextAddressComparingToZero(false, modes));
                     break;
                 case 6:
-                    currentAddress = calculateNextAddressIfFalse(modes);
+                    setCurrentAddress(calculateNextAddressComparingToZero(true, modes));
                     break;
                 case 7:
-                    setMemoryValue(memory[currentAddress + 3],lessThan(modes));
-                    currentAddress += 4;
+                    setMemoryValue(getNewValueDestinationAddress(3), getNewValueBasedOnLessThan(modes));
+                    moveCurrentAddressBy(4);
                     break;
                 case 8:
-                    setMemoryValue(memory[currentAddress + 3],equalsTo(modes));
-                    currentAddress += 4;
+                    setMemoryValue(getNewValueDestinationAddress(3), getNewValueBasedOnEquality(modes));
+                    moveCurrentAddressBy(4);
                     break;
                 case 99:
-                    status = "finished";
+                    status = FINISHED;
                     break;
                 default:
                     throw new IllegalArgumentException("Faulty data.");
@@ -82,22 +84,39 @@ public class IntcodeComputer {
         }
     }
 
+    private int getNewValueDestinationAddress(int relativeAddressOfDestinationAddress) {
+        return memory[currentAddress + relativeAddressOfDestinationAddress];
+    }
+
+    private void moveCurrentAddressBy(int relativeAddress) {
+        currentAddress += relativeAddress;
+    }
+
+    private void setCurrentAddress(int address) {
+        currentAddress = address;
+    }
+
+    private int getInstruction(int instructionAndModes) {
+        return instructionAndModes % 100;
+    }
+
     private Integer readSystemInput() {
         return inputs.get(currentInput++);
     }
 
-    private int[] getModes(int modesInt) {
+    private int[] getModes(int instructionAndModes) {
+        int modesGroupedAsOneNumber = Math.floorDiv(instructionAndModes, 100);
         int[] modes = new int[3];
         for(int i = 0; i < 3; i++)
-            modes[i] = Math.floorDiv(modesInt, (int) Math.pow(10, i)) % 10;
+            modes[i] = Math.floorDiv(modesGroupedAsOneNumber, (int) Math.pow(10, i)) % 10;
         return modes;
     }
 
-    private int equalsTo(int[] modes) {
+    private int getNewValueBasedOnEquality(int[] modes) {
         return performOperation(modes, (v1, v2) -> v1.equals(v2) ? 1 : 0);
     }
 
-    private int lessThan(int[] modes) {
+    private int getNewValueBasedOnLessThan(int[] modes) {
         return performOperation(modes, (v1, v2) -> v1 < v2 ? 1 : 0);
     }
 
@@ -113,27 +132,49 @@ public class IntcodeComputer {
         return performOperation(modes, (v1, v2) -> v1 + v2);
     }
 
-    private int performOperation(int[] modes, BiFunction<Integer, Integer, Integer> callback) {
-        int value1 = getValue(modes[0], 1);
-        int value2 = getValue(modes[1], 2);
-        return callback.apply(value1, value2);
-    }
-
-    private int calculateNextAddressIfFalse(int[] modes) {
-        return getCurrentAddressBasedOnCondition(modes, value -> value == 0);
-    }
-
-    private int calculateNextAddressIfTrue(int[] modes) {
-        return getCurrentAddressBasedOnCondition(modes, value -> value != 0);
+    private int performOperation(int[] modes, BiFunction<Integer, Integer, Integer> condition) {
+        int value1 = getValueFromMemoryBasedOnMode(modes[0], 1);
+        int value2 = getValueFromMemoryBasedOnMode(modes[1], 2);
+        return condition.apply(value1, value2);
     }
 
     private int getCurrentAddressBasedOnCondition(int[] modes, Function<Integer, Boolean> condition) {
-        int valueToBeChecked = getValue(modes[0], 1);
-        return condition.apply(valueToBeChecked) ? getValue(modes[1], 2) : currentAddress + 3;
+        int valueToBeChecked = getValueFromMemoryBasedOnMode(modes[0], 1);
+        return condition.apply(valueToBeChecked) ? getValueFromMemoryBasedOnMode(modes[1], 2) : currentAddress + 3;
     }
 
-    private int getValue(int mode, int parameterPosition) {
-        return mode == 0 ? memory[memory[currentAddress + parameterPosition]] : memory[currentAddress +parameterPosition];
+    private int calculateNextAddressComparingToZero(boolean equalsToZero, int[] modes) {
+        if(equalsToZero) {
+            return getCurrentAddressBasedOnCondition(modes, value -> value == 0);
+        } else {
+            return getCurrentAddressBasedOnCondition(modes, value -> value != 0);
+        }
+    }
+
+    private int getValueFromMemoryBasedOnMode(int mode, int positionParameter) {
+
+        int value;
+        
+        switch (mode) {
+            case 0 :
+                value = getValueInPositionMode(positionParameter);
+                break;
+            case 1 :
+                value = getValueInImmenseMode(positionParameter);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected mode value: " + mode);
+        }
+
+        return value;
+    }
+
+    private int getValueInPositionMode(int position) {
+        return memory[memory[currentAddress + position]];
+    }
+
+    private int getValueInImmenseMode(int position) {
+        return memory[currentAddress + position];
     }
 
     public void setMemoryValue(int index, int value) {
@@ -153,6 +194,10 @@ public class IntcodeComputer {
     }
 
     public boolean hasFinished(){
-        return status.equals("finished");
+        return status == FINISHED;
+    }
+    
+    enum Status {
+        FINISHED, RUNNING, PAUSED
     }
 }
