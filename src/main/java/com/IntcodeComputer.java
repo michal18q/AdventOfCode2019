@@ -16,6 +16,7 @@ public class IntcodeComputer {
     private int currentInput;
     private List<Integer> outputs;
     private Status status;
+    private int relativeBase;
 
 
     public IntcodeComputer(String fileName) {
@@ -26,11 +27,13 @@ public class IntcodeComputer {
         outputs = new ArrayList<>();
         currentAddress = 0;
         status = PAUSED;
+        relativeBase = 0;
     }
 
     public void reset() {
         memory = DataLoader.loadDataFromFile(dataFileName);
         currentAddress = 0;
+        relativeBase = 0;
     }
 
     public void run() {
@@ -59,7 +62,7 @@ public class IntcodeComputer {
                 case 4:
                     outputValue();
                     moveCurrentAddressBy(2);
-                    status = PAUSED;
+//                    status = PAUSED;
                     break;
                 case 5:
                     setCurrentAddress(calculateNextAddressComparingToZero(false, modes));
@@ -75,6 +78,10 @@ public class IntcodeComputer {
                     setMemoryValue(getNewValueDestinationAddress(3), getNewValueBasedOnEquality(modes));
                     moveCurrentAddressBy(4);
                     break;
+                case 9:
+                    adjustRelativeBase();
+                    moveCurrentAddressBy(2);
+                    break;
                 case 99:
                     status = FINISHED;
                     break;
@@ -82,6 +89,10 @@ public class IntcodeComputer {
                     throw new IllegalArgumentException("Faulty data.");
             }
         }
+    }
+
+    private void adjustRelativeBase() {
+        relativeBase += memory[memory[currentAddress+1]];
     }
 
     private int getNewValueDestinationAddress(int relativeAddressOfDestinationAddress) {
@@ -121,6 +132,8 @@ public class IntcodeComputer {
     }
 
     private void outputValue() {
+        int value = memory[memory[currentAddress+1]];
+        System.out.println("Output: " + value);
         outputs.add(memory[memory[currentAddress+1]]);
     }
 
@@ -162,6 +175,9 @@ public class IntcodeComputer {
             case 1 :
                 value = getValueInImmenseMode(positionParameter);
                 break;
+            case 2 :
+                value = getValueInRelativeMode(positionParameter);
+                break;
             default:
                 throw new IllegalStateException("Unexpected mode value: " + mode);
         }
@@ -175,6 +191,10 @@ public class IntcodeComputer {
 
     private int getValueInImmenseMode(int position) {
         return memory[currentAddress + position];
+    }
+
+    private int getValueInRelativeMode(int positionParameter) {
+        return memory[memory[relativeBase + positionParameter]];
     }
 
     public void setMemoryValue(int index, int value) {
