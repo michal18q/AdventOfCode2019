@@ -10,6 +10,8 @@ import static com.IntcodeComputer.Status.*;
 
 public class IntcodeComputer {
 
+    private static final int MAX_NUMBER_OF_PARAMETERS = 3;
+
     private final String dataFileName;
     private long currentAddress;
     private HashMap<Long, Long> memory;
@@ -53,19 +55,17 @@ public class IntcodeComputer {
             switch (instruction) {
                 case 1:
                     numberOfParameters = 3;
-                    long destinationAddress = getAddressOfParameterValueBasedOnMode(parametersModes, numberOfParameters);
-                    long value = addValues(parametersModes);
-                    setMemoryValue(destinationAddress,value);
+                    saveOperationResultToMemory(parametersModes, numberOfParameters, addValues());
                     moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 2:
                     numberOfParameters = 3;
-                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, numberOfParameters), multiplyValues(parametersModes));
+                    saveOperationResultToMemory(parametersModes, numberOfParameters, multiplyValues());
                     moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 3:
                     numberOfParameters = 1;
-                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, numberOfParameters), readSystemInput());
+                    saveOperationResultToMemory(parametersModes, numberOfParameters, readSystemInput());
                     moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 4:
@@ -83,12 +83,12 @@ public class IntcodeComputer {
                     break;
                 case 7:
                     numberOfParameters = 3;
-                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes,numberOfParameters), getNewValueBasedOnLessThan(parametersModes));
+                    saveOperationResultToMemory(parametersModes, numberOfParameters, getNewValueBasedOnLessThan());
                     moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 8:
                     numberOfParameters = 3;
-                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, numberOfParameters), getNewValueBasedOnEquality(parametersModes));
+                    saveOperationResultToMemory(parametersModes, numberOfParameters, getNewValueBasedOnEquality());
                     moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 9:
@@ -106,6 +106,12 @@ public class IntcodeComputer {
         }
     }
 
+    private void saveOperationResultToMemory(int[] parametersModes, int destinationAddressParameter, BiFunction<Long, Long, Long> function) {
+        long address = getAddressOfParameterValueBasedOnMode(parametersModes, destinationAddressParameter);
+        long newValue = getResultOfOperation(parametersModes, function);
+        setMemoryValue(address, newValue);
+    }
+
     private void moveCurrentAddressToNextInstruction(int numberOfAddressesToSkip) {
         currentAddress += numberOfAddressesToSkip + 1;
     }
@@ -118,24 +124,24 @@ public class IntcodeComputer {
         return instructionAndModes % 100;
     }
 
-    private Long readSystemInput() {
-        return inputs.get(currentInput++);
+    private BiFunction<Long, Long, Long> readSystemInput() {
+        return (v1, v2) -> inputs.get(currentInput++);
     }
 
     private int[] getModes(int instructionAndModes) {
         int modesGroupedAsOneNumber = Math.floorDiv(instructionAndModes, 100);
-        int[] modes = new int[3];
-        for(int i = 0; i < 3; i++)
+        int[] modes = new int[MAX_NUMBER_OF_PARAMETERS];
+        for(int i = 0; i < modes.length; i++)
             modes[i] = Math.floorDiv(modesGroupedAsOneNumber, (int) Math.pow(10, i)) % 10;
         return modes;
     }
 
-    private long getNewValueBasedOnEquality(int[] modes) {
-        return performOperation(modes, (v1, v2) -> v1.equals(v2) ? (long) 1 : 0);
+    private BiFunction<Long, Long, Long> getNewValueBasedOnEquality() {
+        return (v1, v2) -> v1.equals(v2) ? (long) 1 : 0;
     }
 
-    private long getNewValueBasedOnLessThan(int[] modes) {
-        return performOperation(modes, (v1, v2) -> v1 < v2 ? (long) 1 : 0);
+    private BiFunction<Long, Long, Long> getNewValueBasedOnLessThan() {
+        return (v1, v2) -> v1 < v2 ? (long) 1 : 0;
     }
 
     private void outputValue(int[] modes) {
@@ -144,15 +150,15 @@ public class IntcodeComputer {
         outputs.add(value);
     }
 
-    private long multiplyValues(int[] modes) {
-        return performOperation(modes, (v1, v2) -> v1 * v2);
+    private BiFunction<Long, Long, Long> multiplyValues() {
+        return (v1, v2) -> v1 * v2;
     }
 
-    private long addValues(int[] modes) {
-        return performOperation(modes, Long::sum);
+    private BiFunction<Long, Long, Long> addValues() {
+        return Long::sum;
     }
 
-    private long performOperation(int[] modes, BiFunction<Long, Long, Long> condition) {
+    private long getResultOfOperation(int[] modes, BiFunction<Long, Long, Long> condition) {
         long value1 = getValueFromMemory(getAddressOfParameterValueBasedOnMode(modes, 1));
         long value2 = getValueFromMemory(getAddressOfParameterValueBasedOnMode(modes, 2));
         return condition.apply(value1, value2);
