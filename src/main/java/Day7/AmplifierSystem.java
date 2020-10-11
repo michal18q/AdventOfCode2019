@@ -1,5 +1,6 @@
 package Day7;
 
+import com.ComputerMode;
 import com.IntcodeComputer;
 
 import java.util.ArrayList;
@@ -12,15 +13,15 @@ public class AmplifierSystem {
     public AmplifierSystem(int numberOfAmplifiers, String inputFileName, List<Integer> phaseSettings) {
         amplifiers = new ArrayList<>();
         for (int i = 0; i < numberOfAmplifiers; i++) {
-            IntcodeComputer amplifier = new IntcodeComputer(inputFileName);
+            IntcodeComputer amplifier = new IntcodeComputer(inputFileName, ComputerMode.MULTI);
             amplifier.addInputValue(phaseSettings.get(i));
             amplifiers.add(amplifier);
         }
     }
 
-    public Integer generateFeedbackLoopSignalToThrusters(int firstInputSignal) {
+    public Long generateFeedbackLoopSignalToThrusters(int firstInputSignal) {
 
-        int currentSignal = firstInputSignal;
+        long currentSignal = firstInputSignal;
 
         while (true) {
             for (IntcodeComputer amplifier : amplifiers) {
@@ -34,9 +35,9 @@ public class AmplifierSystem {
         }
     }
 
-    public Integer generateSingleSignalToThrusters(int firstInputSignal) {
+    public Long generateSingleSignalToThrusters(int firstInputSignal) {
 
-        int currentSignal = firstInputSignal;
+        long currentSignal = firstInputSignal;
 
         for (IntcodeComputer amplifier : amplifiers) {
             amplifier.addInputValue(currentSignal);

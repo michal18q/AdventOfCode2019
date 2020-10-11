@@ -1,6 +1,7 @@
 package com;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -9,17 +10,18 @@ import static com.IntcodeComputer.Status.*;
 
 public class IntcodeComputer {
 
-    private String dataFileName;
-    private int currentAddress;
-    private int[] memory;
-    private List<Integer> inputs;
+    private final String dataFileName;
+    private long currentAddress;
+    private HashMap<Long, Long> memory;
+    private final List<Long> inputs;
     private int currentInput;
-    private List<Integer> outputs;
+    private final List<Long> outputs;
     private Status status;
     private int relativeBase;
+    private final ComputerMode computerMode;
 
 
-    public IntcodeComputer(String fileName) {
+    public IntcodeComputer(String fileName, ComputerMode computerMode) {
         this.dataFileName = fileName;
         memory = DataLoader.loadDataFromFile(dataFileName);
         currentInput = 0;
@@ -28,6 +30,7 @@ public class IntcodeComputer {
         currentAddress = 0;
         status = PAUSED;
         relativeBase = 0;
+        this.computerMode = computerMode;
     }
 
     public void reset() {
@@ -41,49 +44,53 @@ public class IntcodeComputer {
         status = RUNNING;
 
         while (status == RUNNING) {
-            
-            int instructionAndModes = memory[currentAddress];
+
+            int instructionAndModes = (int) getValueFromMemory(currentAddress);
             int instruction = getInstruction(instructionAndModes);
-            int[] modes = getModes(instructionAndModes);
+            int[] parametersModes = getModes(instructionAndModes);
 
             switch (instruction) {
                 case 1:
-                    setMemoryValue(getNewValueDestinationAddress(3), addValues(modes));
+                    long destinationAddress = getAddressOfParameterValueBasedOnMode(parametersModes, 3);
+                    long value = addValues(parametersModes);
+                    setMemoryValue(destinationAddress,value);
                     moveCurrentAddressBy(4);
                     break;
                 case 2:
-                    setMemoryValue(getNewValueDestinationAddress(3), multiplyValues(modes));
+                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, 3), multiplyValues(parametersModes));
                     moveCurrentAddressBy(4);
                     break;
                 case 3:
-                    setMemoryValue(getNewValueDestinationAddress(1), readSystemInput());
+                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, 1), readSystemInput());
                     moveCurrentAddressBy(2);
                     break;
                 case 4:
-                    outputValue();
+                    outputValue(parametersModes);
                     moveCurrentAddressBy(2);
-//                    status = PAUSED;
+                    if(computerMode == ComputerMode.MULTI)
+                        status = PAUSED;
                     break;
                 case 5:
-                    setCurrentAddress(calculateNextAddressComparingToZero(false, modes));
+                    setCurrentAddress(calculateNextAddressComparingToZero(false, parametersModes));
                     break;
                 case 6:
-                    setCurrentAddress(calculateNextAddressComparingToZero(true, modes));
+                    setCurrentAddress(calculateNextAddressComparingToZero(true, parametersModes));
                     break;
                 case 7:
-                    setMemoryValue(getNewValueDestinationAddress(3), getNewValueBasedOnLessThan(modes));
+                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes,3), getNewValueBasedOnLessThan(parametersModes));
                     moveCurrentAddressBy(4);
                     break;
                 case 8:
-                    setMemoryValue(getNewValueDestinationAddress(3), getNewValueBasedOnEquality(modes));
+                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, 3), getNewValueBasedOnEquality(parametersModes));
                     moveCurrentAddressBy(4);
                     break;
                 case 9:
-                    adjustRelativeBase();
+                    adjustRelativeBase(parametersModes);
                     moveCurrentAddressBy(2);
                     break;
                 case 99:
                     status = FINISHED;
+                    System.out.println("Program finished successfully.");
                     break;
                 default:
                     throw new IllegalArgumentException("Faulty data.");
@@ -91,19 +98,11 @@ public class IntcodeComputer {
         }
     }
 
-    private void adjustRelativeBase() {
-        relativeBase += memory[memory[currentAddress+1]];
-    }
-
-    private int getNewValueDestinationAddress(int relativeAddressOfDestinationAddress) {
-        return memory[currentAddress + relativeAddressOfDestinationAddress];
-    }
-
     private void moveCurrentAddressBy(int relativeAddress) {
         currentAddress += relativeAddress;
     }
 
-    private void setCurrentAddress(int address) {
+    private void setCurrentAddress(long address) {
         currentAddress = address;
     }
 
@@ -111,7 +110,7 @@ public class IntcodeComputer {
         return instructionAndModes % 100;
     }
 
-    private Integer readSystemInput() {
+    private Long readSystemInput() {
         return inputs.get(currentInput++);
     }
 
@@ -123,40 +122,41 @@ public class IntcodeComputer {
         return modes;
     }
 
-    private int getNewValueBasedOnEquality(int[] modes) {
-        return performOperation(modes, (v1, v2) -> v1.equals(v2) ? 1 : 0);
+    private long getNewValueBasedOnEquality(int[] modes) {
+        return performOperation(modes, (v1, v2) -> v1.equals(v2) ? (long) 1 : 0);
     }
 
-    private int getNewValueBasedOnLessThan(int[] modes) {
-        return performOperation(modes, (v1, v2) -> v1 < v2 ? 1 : 0);
+    private long getNewValueBasedOnLessThan(int[] modes) {
+        return performOperation(modes, (v1, v2) -> v1 < v2 ? (long) 1 : 0);
     }
 
-    private void outputValue() {
-        int value = memory[memory[currentAddress+1]];
+    private void outputValue(int[] modes) {
+        long value = getValueFromMemory(getAddressOfParameterValueBasedOnMode(modes, 1));
         System.out.println("Output: " + value);
-        outputs.add(memory[memory[currentAddress+1]]);
+        outputs.add(value);
     }
 
-    private int multiplyValues(int[] modes) {
+    private long multiplyValues(int[] modes) {
         return performOperation(modes, (v1, v2) -> v1 * v2);
     }
 
-    private int addValues(int[] modes) {
-        return performOperation(modes, (v1, v2) -> v1 + v2);
+    private long addValues(int[] modes) {
+        return performOperation(modes, Long::sum);
     }
 
-    private int performOperation(int[] modes, BiFunction<Integer, Integer, Integer> condition) {
-        int value1 = getValueFromMemoryBasedOnMode(modes[0], 1);
-        int value2 = getValueFromMemoryBasedOnMode(modes[1], 2);
+    private long performOperation(int[] modes, BiFunction<Long, Long, Long> condition) {
+        long value1 = getValueFromMemory(getAddressOfParameterValueBasedOnMode(modes, 1));
+        long value2 = getValueFromMemory(getAddressOfParameterValueBasedOnMode(modes, 2));
         return condition.apply(value1, value2);
     }
 
-    private int getCurrentAddressBasedOnCondition(int[] modes, Function<Integer, Boolean> condition) {
-        int valueToBeChecked = getValueFromMemoryBasedOnMode(modes[0], 1);
-        return condition.apply(valueToBeChecked) ? getValueFromMemoryBasedOnMode(modes[1], 2) : currentAddress + 3;
+    private long getCurrentAddressBasedOnCondition(int[] modes, Function<Long, Boolean> condition) {
+        long valueToBeChecked = getValueFromMemory(getAddressOfParameterValueBasedOnMode(modes, 1));
+        return condition.apply(valueToBeChecked) ? getValueFromMemory(getAddressOfParameterValueBasedOnMode(modes, 2)) : currentAddress + 3;
     }
 
-    private int calculateNextAddressComparingToZero(boolean equalsToZero, int[] modes) {
+    private long calculateNextAddressComparingToZero(boolean equalsToZero, int[] modes) {
+
         if(equalsToZero) {
             return getCurrentAddressBasedOnCondition(modes, value -> value == 0);
         } else {
@@ -164,53 +164,62 @@ public class IntcodeComputer {
         }
     }
 
-    private int getValueFromMemoryBasedOnMode(int mode, int positionParameter) {
+    private void adjustRelativeBase(int[] modes) {
+        relativeBase += getValueFromMemory(getAddressOfParameterValueBasedOnMode(modes, 1));
+    }
 
-        int value;
-        
+    private long getAddressOfParameterValueBasedOnMode(int[] modes, int parameterDistanceFromCurrentAddress) {
+
+        long address;
+        int mode = modes[parameterDistanceFromCurrentAddress-1];
+
         switch (mode) {
             case 0 :
-                value = getValueInPositionMode(positionParameter);
+                address = getAddressInPositionMode(parameterDistanceFromCurrentAddress);
                 break;
             case 1 :
-                value = getValueInImmenseMode(positionParameter);
+                address = getAddressInImmenseMode(parameterDistanceFromCurrentAddress);
                 break;
             case 2 :
-                value = getValueInRelativeMode(positionParameter);
+                address = getAddressInRelativeMode(parameterDistanceFromCurrentAddress);
                 break;
             default:
                 throw new IllegalStateException("Unexpected mode value: " + mode);
         }
 
-        return value;
+        return address;
     }
 
-    private int getValueInPositionMode(int position) {
-        return memory[memory[currentAddress + position]];
+    private long getAddressInPositionMode(int distanceFromCurrentAddress) {
+        return getValueFromMemory(currentAddress + distanceFromCurrentAddress);
     }
 
-    private int getValueInImmenseMode(int position) {
-        return memory[currentAddress + position];
+    private long getAddressInImmenseMode(int distanceFromCurrentAddress) {
+        return currentAddress + distanceFromCurrentAddress;
     }
 
-    private int getValueInRelativeMode(int positionParameter) {
-        return memory[memory[relativeBase + positionParameter]];
+    private long getAddressInRelativeMode(int distanceFromCurrentAddress) {
+        return relativeBase + getAddressInPositionMode(distanceFromCurrentAddress);
     }
 
-    public void setMemoryValue(int index, int value) {
-        memory[index] = value;
+    public void setMemoryValue(long index, long value) {
+        memory.put(index, value);
     }
 
-    public int getValueFromMemory(int index) {
-        return memory[index];
+    public long getValueFromMemory(long index) {
+        return memory.containsKey(index) ? memory.get(index) : 0;
     }
 
-    public void addInputValue(int inputValue) {
+    public void addInputValue(long inputValue) {
         inputs.add(inputValue);
     }
 
-    public int getLastOutput() {
+    public long getLastOutput() {
         return outputs.get(outputs.size()-1);
+    }
+
+    public List<Long> getOutputs() {
+        return outputs;
     }
 
     public boolean hasFinished(){

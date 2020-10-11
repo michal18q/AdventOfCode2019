@@ -1,12 +1,13 @@
 package Day2;
 
+import com.ComputerMode;
 import com.IntcodeComputer;
 
 public class NounAndVerbFinder {
 
-    public static Integer findNounAndVerb(String fileName, int desiredValue) {
+    public static Long findNounAndVerb(String fileName, int desiredValue) {
 
-        IntcodeComputer computer = new IntcodeComputer(fileName);
+        IntcodeComputer computer = new IntcodeComputer(fileName, ComputerMode.SINGLE);
 
         for(int noun = 0; noun <= 99; noun++) {
             for (int verb = 0; verb <= 99; verb++) {

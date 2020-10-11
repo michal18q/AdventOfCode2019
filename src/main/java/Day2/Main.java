@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int finalValue = NounAndVerbFinder.findNounAndVerb(fileName, desiredValue);
+        long finalValue = NounAndVerbFinder.findNounAndVerb(fileName, desiredValue);
         System.out.println("Final result: " + finalValue);
     }
 }

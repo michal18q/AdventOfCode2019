@@ -6,7 +6,7 @@ public class Main {
     public static final int systemID = 5;
 
     public static void main(String[] args) {
-        int diagnosticCode = DiagnosticCodeCalculator.calculateDiagnosticCode(inputFileName, systemID);
+        long diagnosticCode = DiagnosticCodeCalculator.calculateDiagnosticCode(inputFileName, systemID);
         System.out.println("Diagnostic code for system ID 5: " + diagnosticCode);
     }
 }

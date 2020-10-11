@@ -3,24 +3,26 @@ package com;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 
-import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 
 public class DataLoader {
 
-    public static int[] loadDataFromFile(String fileName) {
+    public static HashMap<Long, Long> loadDataFromFile(String fileName) {
+
+        HashMap<Long, Long> memory = new HashMap<>();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String[] program = reader.readLine().split(",");
-            int[] memory = new int[program.length];
             for (int i = 0; i < program.length; i++) {
-                memory[i] = parseInt(program[i]);
+                memory.put((long)i, parseLong(program[i]));
             }
-            return memory;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new int[0];
+
+        return memory;
     }
 }

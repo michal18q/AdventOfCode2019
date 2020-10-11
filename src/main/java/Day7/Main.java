@@ -21,12 +21,12 @@ public class Main {
         PhaseSettingsGenerator generator = new PhaseSettingsGenerator();
         List<List<Integer>> allPhaseSettingsPermutations = generator.generateAllPhaseSettingsPermutations(minPhaseSettingValue, maxPhaseSettingValue);
 
-        int highestFinalSignal = 0;
+        long highestFinalSignal = 0;
         List<Integer> bestSequence = null;
 
         for(List<Integer> phaseSettings : allPhaseSettingsPermutations) {
             AmplifierSystem amplifierSystem = new AmplifierSystem(numberOfAmplifiers, inputFileName, phaseSettings);
-            int signalToThrusters = amplifierSystem.generateFeedbackLoopSignalToThrusters(firstInputSignal);
+            long signalToThrusters = amplifierSystem.generateFeedbackLoopSignalToThrusters(firstInputSignal);
             if(signalToThrusters > highestFinalSignal) {
                 highestFinalSignal = signalToThrusters;
                 bestSequence = phaseSettings;
@@ -45,12 +45,12 @@ public class Main {
         PhaseSettingsGenerator generator = new PhaseSettingsGenerator();
         List<List<Integer>> allPhaseSettingsPermutations = generator.generateAllPhaseSettingsPermutations(minPhaseSettingValue, maxPhaseSettingValue);
 
-        int highestFinalSignal = 0;
+        long highestFinalSignal = 0;
         List<Integer> bestSequence = null;
 
         for(List<Integer> phaseSettings : allPhaseSettingsPermutations) {
             AmplifierSystem amplifierSystem = new AmplifierSystem(numberOfAmplifiers, inputFileName, phaseSettings);
-            int finalSignal = amplifierSystem.generateSingleSignalToThrusters(firstInputSignal);
+            long finalSignal = amplifierSystem.generateSingleSignalToThrusters(firstInputSignal);
             if(finalSignal > highestFinalSignal) {
                 highestFinalSignal = finalSignal;
                 bestSequence = phaseSettings;
