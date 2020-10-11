@@ -23,14 +23,14 @@ public class IntcodeComputer {
 
     public IntcodeComputer(String fileName, ComputerMode computerMode) {
         this.dataFileName = fileName;
-        memory = DataLoader.loadDataFromFile(dataFileName);
-        currentInput = 0;
-        inputs = new ArrayList<>();
-        outputs = new ArrayList<>();
-        currentAddress = 0;
-        status = PAUSED;
-        relativeBase = 0;
         this.computerMode = computerMode;
+        memory = DataLoader.loadDataFromFile(dataFileName);
+        currentAddress = 0;
+        inputs = new ArrayList<>();
+        currentInput = 0;
+        outputs = new ArrayList<>();
+        relativeBase = 0;
+        status = PAUSED;
     }
 
     public void reset() {
@@ -45,28 +45,33 @@ public class IntcodeComputer {
 
         while (status == RUNNING) {
 
-            int instructionAndModes = (int) getValueFromMemory(currentAddress);
-            int instruction = getInstruction(instructionAndModes);
-            int[] parametersModes = getModes(instructionAndModes);
+            int instructionAndParametersModes = (int) getValueFromMemory(currentAddress);
+            int instruction = getInstruction(instructionAndParametersModes);
+            int[] parametersModes = getModes(instructionAndParametersModes);
+            int numberOfParameters;
 
             switch (instruction) {
                 case 1:
-                    long destinationAddress = getAddressOfParameterValueBasedOnMode(parametersModes, 3);
+                    numberOfParameters = 3;
+                    long destinationAddress = getAddressOfParameterValueBasedOnMode(parametersModes, numberOfParameters);
                     long value = addValues(parametersModes);
                     setMemoryValue(destinationAddress,value);
-                    moveCurrentAddressBy(4);
+                    moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 2:
-                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, 3), multiplyValues(parametersModes));
-                    moveCurrentAddressBy(4);
+                    numberOfParameters = 3;
+                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, numberOfParameters), multiplyValues(parametersModes));
+                    moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 3:
-                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, 1), readSystemInput());
-                    moveCurrentAddressBy(2);
+                    numberOfParameters = 1;
+                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, numberOfParameters), readSystemInput());
+                    moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 4:
+                    numberOfParameters = 1;
                     outputValue(parametersModes);
-                    moveCurrentAddressBy(2);
+                    moveCurrentAddressToNextInstruction(numberOfParameters);
                     if(computerMode == ComputerMode.MULTI)
                         status = PAUSED;
                     break;
@@ -77,16 +82,19 @@ public class IntcodeComputer {
                     setCurrentAddress(calculateNextAddressComparingToZero(true, parametersModes));
                     break;
                 case 7:
-                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes,3), getNewValueBasedOnLessThan(parametersModes));
-                    moveCurrentAddressBy(4);
+                    numberOfParameters = 3;
+                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes,numberOfParameters), getNewValueBasedOnLessThan(parametersModes));
+                    moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 8:
-                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, 3), getNewValueBasedOnEquality(parametersModes));
-                    moveCurrentAddressBy(4);
+                    numberOfParameters = 3;
+                    setMemoryValue(getAddressOfParameterValueBasedOnMode(parametersModes, numberOfParameters), getNewValueBasedOnEquality(parametersModes));
+                    moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 9:
+                    numberOfParameters = 1;
                     adjustRelativeBase(parametersModes);
-                    moveCurrentAddressBy(2);
+                    moveCurrentAddressToNextInstruction(numberOfParameters);
                     break;
                 case 99:
                     status = FINISHED;
@@ -98,8 +106,8 @@ public class IntcodeComputer {
         }
     }
 
-    private void moveCurrentAddressBy(int relativeAddress) {
-        currentAddress += relativeAddress;
+    private void moveCurrentAddressToNextInstruction(int numberOfAddressesToSkip) {
+        currentAddress += numberOfAddressesToSkip + 1;
     }
 
     private void setCurrentAddress(long address) {
