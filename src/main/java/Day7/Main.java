@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Main {
 
-    private static String inputFileName = "src/main/resources/Zad7/input.txt";
+    private static String inputFileName = "src/main/resources/Day7/input.txt";
     private static int numberOfAmplifiers = 5;
 
     public static void main(String[] args) {
