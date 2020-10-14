@@ -10,7 +10,7 @@ class Day2Specification extends Specification {
         def desiredValue = 19690720
 
         when:
-        def result = NounAndVerbFinder.findNounAndVerb(fileName, desiredValue)
+        def result = NounAndVerbFinder.findNounAndVerbResultValue(fileName, desiredValue)
 
         then:
         result == 6979

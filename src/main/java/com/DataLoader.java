@@ -9,15 +9,16 @@ import static java.lang.Long.parseLong;
 
 public class DataLoader {
 
-    public static HashMap<Long, Long> loadDataFromFile(String fileName) {
+    public static HashMap<Long, Long> loadComputerMemoryFromFile(String fileName) {
 
         HashMap<Long, Long> memory = new HashMap<>();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String[] program = reader.readLine().split(",");
-            for (int i = 0; i < program.length; i++) {
-                memory.put((long)i, parseLong(program[i]));
+            for (int memoryIndex = 0; memoryIndex < program.length; memoryIndex++) {
+                long memoryValue = parseLong(program[memoryIndex]);
+                memory.put((long) memoryIndex, memoryValue);
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -15,7 +15,7 @@ public class ComputerMemory {
     }
 
     private void initialize() {
-        memory = DataLoader.loadDataFromFile(dataSourceFileName);
+        memory = DataLoader.loadComputerMemoryFromFile(dataSourceFileName);
         instructionPointer = 0;
         relativeBase = 0;
     }

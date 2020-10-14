@@ -10,9 +10,8 @@ public class SpaceObject {
     private SpaceObject orbitCenter;
     private List<SpaceObject> orbitingSpaceObjects;
 
-    public SpaceObject(String name, SpaceObject directlyOrbits) {
+    public SpaceObject(String name) {
         this.name = name;
-        this.orbitCenter = directlyOrbits;
         orbitingSpaceObjects = new ArrayList<>();
     }
 
@@ -28,7 +27,7 @@ public class SpaceObject {
         return orbitCenter != null ? 1 + orbitCenter.countNumberOfOrbitsToCenterOfMass() : 0;
     }
 
-    public ArrayList getAllSpaceObjectsToReachOrbit(SpaceObject searchedOrbitCenter) {
+    public ArrayList<SpaceObject> getAllSpaceObjectsToReachOrbit(SpaceObject searchedOrbitCenter) {
         ArrayList<SpaceObject> allSpaceObjectsToReachCenterOfMass = new ArrayList<>();
         if(orbitCenter != searchedOrbitCenter) {
             allSpaceObjectsToReachCenterOfMass.add(orbitCenter);
@@ -43,14 +42,5 @@ public class SpaceObject {
         if (o == null || getClass() != o.getClass()) return false;
         SpaceObject that = (SpaceObject) o;
         return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    public String getName() {
-        return name;
     }
 }

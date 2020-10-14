@@ -19,7 +19,6 @@ public class PhaseSettingsGenerator {
         return allPhaseSettingsPermutations;
     }
 
-
     private void getPermutations(List<Integer> alreadyPermuted, List<Integer> toBePermuted) {
 
         if(toBePermuted.size() == 1) {

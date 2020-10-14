@@ -6,10 +6,10 @@ public class Intersection {
     private int y;
     private int distanceFromCenter;
 
-    public Intersection(int x, int y, int startingPointX, int startingPointY) {
-        this.x = x;
-        this.y = y;
-        this.distanceFromCenter = Math.abs(x - startingPointX) + Math.abs(y - startingPointY);
+    public Intersection(Position position, Position startingPosition) {
+        this.x = position.getPositionX();
+        this.y = position.getPositionY();
+        this.distanceFromCenter = Math.abs(x - startingPosition.getPositionX()) + Math.abs(y - startingPosition.getPositionY());
     }
 
     public int getDistanceFromCenter() {

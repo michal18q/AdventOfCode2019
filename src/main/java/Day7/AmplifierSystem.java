@@ -19,32 +19,41 @@ public class AmplifierSystem {
         }
     }
 
+    public Long generateSingleSignalToThrusters(int firstInputSignal) {
+
+        long currentSignal = firstInputSignal;
+
+        for (IntcodeComputer amplifier : amplifiers) {
+            currentSignal = getSignalCalculatedByAmplifier(currentSignal, amplifier);
+        }
+        return currentSignal;
+    }
+
     public Long generateFeedbackLoopSignalToThrusters(int firstInputSignal) {
 
         long currentSignal = firstInputSignal;
 
         while (true) {
             for (IntcodeComputer amplifier : amplifiers) {
-                amplifier.addInputValue(currentSignal);
-                amplifier.run();
-                currentSignal = amplifier.getLastOutput();
+                currentSignal = getSignalCalculatedByAmplifier(currentSignal, amplifier);
             }
 
-            if (amplifiers.get(amplifiers.size() - 1).hasFinished())
-                return amplifiers.get(amplifiers.size() - 1).getLastOutput();
+            if (hasLastAmplifierFinishedItsProgram())
+                return getOutputOfLastAmplifier();
         }
     }
 
-    public Long generateSingleSignalToThrusters(int firstInputSignal) {
+    private long getSignalCalculatedByAmplifier(long inputSignal, IntcodeComputer amplifier) {
+        amplifier.addInputValue(inputSignal);
+        amplifier.run();
+        return amplifier.getLastOutput();
+    }
 
-        long currentSignal = firstInputSignal;
+    private long getOutputOfLastAmplifier() {
+        return amplifiers.get(amplifiers.size() - 1).getLastOutput();
+    }
 
-        for (IntcodeComputer amplifier : amplifiers) {
-            amplifier.addInputValue(currentSignal);
-            amplifier.run();
-            currentSignal = amplifier.getLastOutput();
-        }
-
-        return currentSignal;
+    private boolean hasLastAmplifierFinishedItsProgram() {
+        return amplifiers.get(amplifiers.size() - 1).hasFinished();
     }
 }
